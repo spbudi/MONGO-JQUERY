@@ -122,7 +122,7 @@ const editData = (user) => {
   $('#integer').val(user.integer);
   $('#float').val(user.float);
   $('#date').val(moment(user.date).format('YYYY-MM-DD'));
-  $('#boolean').val(user.boolean);
+  $(`#boolean option[value=${user.boolean}]`).prop('selected', true)
 };
 
 const pagination = () => {
@@ -169,26 +169,18 @@ $('#resetData').on('click', (event) => {
   readData();
 });
 
-document.getElementById('form-search').addEventListener('submit', (event) => {
-  event.preventDefault();
-  const page = 1;
-  const string = document.getElementById('searchString').value;
-  const integer = document.getElementById('searchInteger').value;
-  const float = document.getElementById('searchFloat').value;
-  const startDate = document.getElementById('searchStartDate').value;
-  const endDate = document.getElementById('searchEndDate').value;
-  const boolean = document.getElementById('searchBoolean').value;
-  params = {
-    ...params,
-    string,
-    integer,
-    float,
-    startDate,
-    endDate,
-    boolean,
-    page,
-  };
-  readData();
+$("#form-search").on("submit", (event) => {
+  event.preventDefault()
+  const page = 1
+  const string = $('#searchString').val()
+  const integer = $('#searchInteger').val()
+  const float = $('#searchFloat').val()
+  const startDate = $('#searchStartDate').val()
+  const endDate = $('#searchEndDate').val()
+  const boolean = $('#searchBoolean').val()
+  console.log(startDate, endDate, 'Start End')
+  params = { ...params, string, integer, float, startDate, endDate, boolean, page }
+  readData()
 });
 
 readData();
