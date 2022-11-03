@@ -90,25 +90,24 @@ let idEdit = null;
         return false
       }
       const removeData = (id) => {
-        fetch(`http://localhost:3000/users/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-
-        }).then((response) => response.json()).then((data) => {
+        $.ajax({
+          method: "DELETE",
+          url: `http://localhost:3000/users/${id}`,
+          dataType: "json"
+      }).done(function (response) {
           readData()
-        })
+      }).fail(function (err) {
+          alert('gagal pakai jquery')
+      })
       }
 
-      const editData = (data) => {
-
-        idEdit = data._id
-        document.getElementById('string').value = data.string
-        document.getElementById('integer').value = data.integer
-        document.getElementById('float').value = data.float
-        document.getElementById('date').value = moment(data.date).format("YYYY-MM-DD")
-        document.getElementById('boolean').value = data.boolean
+      const editData = (user) => {
+        idEdit = user._id
+        $('#string').val(user.string)
+        $('#integer').val(user.integer)
+        $('#float').val(user.float)
+        $('#date').val(moment(user.date).format('YYYY-MM-DD'))
+        $('#boolean').val(user.boolean)
       }
 
       const pagination = () => {
