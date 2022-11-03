@@ -4,30 +4,15 @@ let params = {
 };
 
 const readData = () => {
-  fetch(`http://localhost:3000/users?`)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Erorr(`HTTP error! status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then((response) => {
+  $.ajax({
+    method: 'GET',
+    url: `http://localhost:3000/users?${new URLSearchParams(params).toString()}`
+  }).done((response) => {
       params = { ...params, totalPages: response.totalPages };
-      fetch(
-        `http://localhost:3000/users?${new URLSearchParams(params).toString()}`
-      )
-        .then((response) => {
-          if (!response.ok) {
-            throw new Erorr(`HTTP error! status ${response.status}`);
-          }
-          return response.json();
-        })
-        .then((response) => {
-          params = { ...params, totalPages: response.totalPages };
-          let html = '';
-          let offset = response.offset;
-          response.data.forEach((item, index) => {
-            html += `
+      let html = '';
+      let offset = response.offset;
+      response.data.forEach((item, index) => {
+        html += `
                         <tr>
                             <td>${index + 1 + offset}</td>
                             <td>${item.string}</td>
@@ -51,11 +36,12 @@ const readData = () => {
                             </td>
                         </tr>
                         `;
-          });
-          $('#body-users').html(html)
-          pagination();
-        });
-    });
+      });
+      $('#body-users').html(html);
+      pagination();
+    }).fail((e)=>{
+      alert('fail')
+    })
 };
 
 const saveData = (e) => {
@@ -95,11 +81,11 @@ const saveData = (e) => {
       });
     editID = null;
   }
-  $('#string').val('')
-  $('#integer').val('')
-  $('#float').val('')
-  $('#date').val('')
-  $('#boolean').val('')
+  $('#string').val('');
+  $('#integer').val('');
+  $('#float').val('');
+  $('#date').val('');
+  $('#boolean').val('');
 };
 
 const removeData = (id) => {
@@ -122,7 +108,7 @@ const editData = (user) => {
   $('#integer').val(user.integer);
   $('#float').val(user.float);
   $('#date').val(moment(user.date).format('YYYY-MM-DD'));
-  $(`#boolean option[value=${user.boolean}]`).prop('selected', true)
+  $(`#boolean option[value=${user.boolean}]`).prop('selected', true);
 };
 
 const pagination = () => {
@@ -151,7 +137,7 @@ const pagination = () => {
         </li>
         
         </ul>`;
-  document.getElementById('pagination').innerHTML = pagination;
+  $('#pagination').html(pagination)
 };
 
 function changePage(page) {
@@ -169,18 +155,44 @@ $('#resetData').on('click', (event) => {
   readData();
 });
 
-$("#form-search").on("submit", (event) => {
-  event.preventDefault()
-  const page = 1
-  const string = $('#searchString').val()
-  const integer = $('#searchInteger').val()
-  const float = $('#searchFloat').val()
-  const startDate = $('#searchStartDate').val()
-  const endDate = $('#searchEndDate').val()
-  const boolean = $('#searchBoolean').val()
-  console.log(startDate, endDate, 'Start End')
-  params = { ...params, string, integer, float, startDate, endDate, boolean, page }
-  readData()
+$('#form-search').on('submit', (event) => {
+  event.preventDefault();
+  const page = 1;
+  const string = $('#searchString').val();
+  const integer = $('#searchInteger').val();
+  const float = $('#searchFloat').val();
+  const startDate = $('#searchStartDate').val();
+  const endDate = $('#searchEndDate').val();
+  const boolean = $('#searchBoolean').val();
+  console.log(startDate, endDate, 'Start End');
+  params = {
+    ...params,
+    string,
+    integer,
+    float,
+    startDate,
+    endDate,
+    boolean,
+    page,
+  };
+  readData();
 });
 
-readData();
+$(document).ready(() => {
+  readData()
+  $('th').click(function () {
+    var table = $(this).parents('table').eq(0)
+    var rows = table.find('tr:gt(0)').toArray().sort(comparer($(this).index()))
+    this.asc = !this.asc
+    if (!this.asc) { rows = rows.reverse() }
+    for (var i = 0; i < rows.length; i++) { table.append(rows[i]) }
+})
+function comparer(index) {
+    return function (a, b) {
+        var valA = getCellValue(a, index), valB = getCellValue(b, index)
+        return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.toString().localeCompare(valB)
+    }
+}
+function getCellValue(row, index) { return $(row).children('td').eq(index).text() }
+
+})
