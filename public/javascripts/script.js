@@ -52,7 +52,7 @@ const readData = () => {
                         </tr>
                         `;
           });
-          document.getElementById('body-users').innerHTML = html;
+          $('#body-users').html(html)
           pagination();
         });
     });
@@ -108,11 +108,11 @@ const removeData = (id) => {
     url: `http://localhost:3000/users/${id}`,
     dataType: 'json',
   })
-    .done(function (response) {
+    .done((data) => {
       readData();
     })
     .fail(function (err) {
-      alert('gagal pakai jquery');
+      alert('fail');
     });
 };
 
@@ -153,6 +153,7 @@ const pagination = () => {
         </ul>`;
   document.getElementById('pagination').innerHTML = pagination;
 };
+
 function changePage(page) {
   params = { ...params, page };
   console.log(params);
